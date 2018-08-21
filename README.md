@@ -77,7 +77,7 @@ cd dockerfiles-lnmp/dockerfiles
 docker-compose up  
 
 ```  
-3,修改本地host 查看不到版本php
+3,修改本地host 查看不同版本php-fpm
 ```  
 127.0.0.1 php72.com
 127.0.0.1 php56.com 
@@ -166,18 +166,9 @@ docker-compose exec [images] bash # 例如 docker-compose exec php-fpm bash
 ```
 创建并启动一个容器，在run后面加上-d参数，则会创建一个守护式容器在后台运行
 ```
-docker run 
+docker run -d
 ```
-查看已经创建的容器
 
-```
-docker ps -a 
-```
-查看已经启动的容器
-
-```
-docker ps -s 
-```
 启动容器名为con_name的容器
 ```
 docker start con_name 
