@@ -66,20 +66,24 @@ zookeeper
 ## 使用
 
 #### 下载dockerfiles-lnmp
-直接clone：
+1,直接clone：
 ```
 git clone git@github.com:duzhenxun/dockerfiles-lnmp.git
 chmod -R 777 ./dockerfiles-lnmp/data/logs
 cd dockerfiles-lnmp/dockerfiles
 ```
-进行docker-compose.yml所在文件夹执行命令即可：
+2,进行docker-compose.yml所在文件夹执行命令即可：
 ```
 docker-compose up  
 
 ```  
+3,修改本地host 查看不到版本php
+```  
+127.0.0.1 php72.com
+127.0.0.1 php56.com 
+``` 
 
-
-## dokcer 常用命令
+# 其它 dokcer 常用命令
 
 所有容器将后台运行：  
 ```
