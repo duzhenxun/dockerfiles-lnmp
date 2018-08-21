@@ -15,8 +15,7 @@ services:
       - ./nginx/certs/:/etc/nginx/certs
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"
     restart: always
     command: nginx -g 'daemon off;'
 
@@ -80,6 +79,21 @@ services:
       restart: always
 
   memcached:
-        image: memcached:1.5.7
-        ports:
-          - "11211:11211"
+      image: memcached:1.5.7
+      #ports:
+      #  - "11211:11211"
+
+#远程管理工具
+#phpmyadmin:
+#  image: phpmyadmin/phpmyadmin:latest
+#  links:
+# - mysql
+# ports:
+# - "8086:80"
+
+#phpredisadmin:
+#  image: erikdubbelboer/phpredisadmin:latest
+# links:
+#  - redis
+# ports:
+# - "8089:80"
