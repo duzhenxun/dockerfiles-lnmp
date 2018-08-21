@@ -1,41 +1,13 @@
-version: '3.2'
+version: '3'
 services:
-  php56-fpm:
-    build: ./php56/
-    ports:
-      - "9072:9000"
-    links:
-      - mysql-db:mysql-db
-    volumes:
-      - ../data/www:/data/www:rw
-      - ../data/logs/php56-fpm:/var/log/php-fpm:rw
-      - ./php56/php.ini:/usr/local/etc/php/php.ini:ro # 当前php配置文件；可以拷贝修改php-dev.ini为想要的配置
-      - ./php56/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
-    restart: always
-    command: php-fpm
-
-  php72-fpm:
-    build: ./php72/
-    ports:
-      - "9072:9000"
-    links:
-      - mysql-db:mysql-db
-    volumes:
-      - ../data/www:/data/www:rw
-      - ../data/logs/php72-fpm:/var/log/php-fpm:rw
-      - ./php72/php.ini:/usr/local/etc/php/php.ini:ro # 当前php配置文件；可以拷贝修改php-dev.ini为想要的配置
-      - ./php72/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
-    restart: always
-    command: php-fpm  
-
   nginx:
     build: ./nginx
     depends_on:
-      - php56-fpm
-      - php72-fpm
+      - php56
+      - php72
     links:
-      - php56-fpm:php56-fpm
-      - php72-fpm:php72-fpm
+      - php72:php72-fpm
+      - php56:php56-fpm
     volumes:
       - ../data/www:/data/www:rw
       - ../data/logs/nginx:/var/log/nginx
@@ -44,12 +16,47 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
       - "80:80"
-      - "8080:8080"
       - "443:443"
     restart: always
     command: nginx -g 'daemon off;'
 
-  mysql-db:
+  php72:
+    build: ./php72/
+    depends_on:
+      - mysql
+      - redis
+      - memcached
+    links:
+      - mysql
+      - redis
+      - memcached
+    volumes:
+      - ../data/www:/data/www:rw
+      - ../data/logs/php72-fpm:/var/log/php-fpm:rw
+      - ./php72/php.ini:/usr/local/etc/php/php.ini:ro 
+      - ./php72/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
+    restart: always
+    command: php-fpm
+
+  php56:
+    build: ./php56/
+    depends_on:
+      - mysql
+      - redis
+      - memcached
+    links:
+      - mysql
+      - redis
+      - memcached
+    volumes:
+      - ../data/www:/data/www:rw
+      - ../data/logs/php56-fpm:/var/log/php-fpm:rw
+      - ./php56/php.ini:/usr/local/etc/php/php.ini:ro 
+      - ./php56/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
+    restart: always
+    command: php-fpm
+
+  mysql:
       build: ./mysql
       ports:
         - "3306:3306"
@@ -59,9 +66,20 @@ services:
         - ./mysql/conf.d:/etc/mysql/conf.d:ro
       environment:
         MYSQL_ROOT_PASSWORD: 123456
-        MYSQL_DATABASE: zx
-        MYSQL_USER: admin
-        MYSQL_PASSWORD: admin
       restart: always
       command: "--character-set-server=utf8"
 
+  redis:
+      build: ./redis
+      ports:
+        - "6379:6379"
+      volumes:
+        - ../data/db/redis:/data
+        - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro 
+        - ../data/logs/redis:/var/log/redis
+      restart: always
+
+  memcached:
+        image: memcached:1.5.7
+        ports:
+          - "11211:11211"

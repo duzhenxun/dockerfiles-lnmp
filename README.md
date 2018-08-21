@@ -4,12 +4,50 @@ Docker搭建php5.6，php7.2，nginx1.12，redis4.0，mysql5.7，memcached1.5，s
 相关软件版本：
 - PHP 7.2
 - PHP 5.6
-- MySQL 5.7 (root账号:root;密码123456!,成员账号:admin;密码:adminadmin)
+- MySQL 5.7 (root账号:root;密码123456)
 - Nginx 1.12
-- 
-用到的PHP扩展
-- redis,swoole,memcached,GD,curl...
-
+- memcher
+- 用到的PHP扩展
+-- bcmath
+Core
+ctype
+curl
+date
+dom
+fileinfo
+filter
+ftp
+gd
+gettext
+gmagick
+hash
+iconv
+json
+ldap
+libxml
+mbstring
+mcrypt
+memcached
+mongodb
+mysqli
+mysqlnd
+openssl
+pcntl
+pcre
+PDO
+pdo_mysql
+pdo_sqlite
+Phar
+posix
+readline
+redis
+swoole
+ssh2
+yaf
+yaconf
+zip
+zookeeper
+（注：gmagick 和 imagick 扩展冲突，默认只启用了gmagick扩展）
 #### 目录说明
 目录 | 说明
 ---|---
@@ -20,6 +58,7 @@ Docker搭建php5.6，php7.2，nginx1.12，redis4.0，mysql5.7，memcached1.5，s
 --- dockerfiles | docker镜像配置
 --- --- mysql | mysql配置及安装文件
 --- --- nginx | nginx配置及安装文件
+--- --- redis | redis配置及安装文件
 --- --- php56 | php5.6配置及安装文件
 --- --- php72 | php7.2配置及安装文件
 --- --- docker-composer.yml | docker配置执行文件
@@ -33,10 +72,13 @@ git clone git@github.com:duzhenxun/dockerfiles-lnmp.git
 chmod -R 777 ./dockerfiles-lnmp/data/logs
 cd dockerfiles-lnmp/dockerfiles
 ```
-进行docker-compose.yml所在文件夹执行命令：
+进行docker-compose.yml所在文件夹执行命令即可：
 ```
-docker-compose up
+docker-compose up  
+
 ```  
+
+
 ## dokcer 常用命令
 
 所有容器将后台运行：  

@@ -1,0 +1,5 @@
+*.log
+*.swp
+!.gitkeep
+.DS_Store
+.idea
