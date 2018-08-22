@@ -1,99 +1,117 @@
-version: '3'
+version: '2'
 services:
   nginx:
     build: ./nginx
     depends_on:
-      - php56
-      - php72
+    - php56
+    - php72
     links:
-      - php72:php72-fpm
-      - php56:php56-fpm
+    - php72:php72-fpm
+    - php56:php56-fpm
     volumes:
-      - ../data/www:/data/www:rw
-      - ../data/logs/nginx:/var/log/nginx
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - ./nginx/certs/:/etc/nginx/certs
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    - ../data/www:/data/www:rw
+    - ../data/logs/nginx:/var/log/nginx
+    - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    - ./nginx/certs/:/etc/nginx/certs
+    - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
-      - "8080:80"
+    - "8080:80"
     restart: always
     command: nginx -g 'daemon off;'
+    networks:
+    - vpcbr
 
   php72:
     build: ./php72/
-    depends_on:
-      - mysql
-      - redis
-      - memcached
-    links:
-      - mysql
-      - redis
-      - memcached
     volumes:
-      - ../data/www:/data/www:rw
-      - ../data/logs/php72-fpm:/var/log/php-fpm:rw
-      - ./php72/php.ini:/usr/local/etc/php/php.ini:ro 
-      - ./php72/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
+    - ../data/www:/data/www:rw
+    - ../data/logs/php72-fpm:/var/log/php-fpm:rw
+    - ./php72/php.ini:/usr/local/etc/php/php.ini:ro
+    - ./php72/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
     restart: always
     command: php-fpm
+    networks:
+    - vpcbr
 
   php56:
     build: ./php56/
     depends_on:
-      - mysql
-      - redis
-      - memcached
+    - mysql
+    - redis
+    - memcached
     links:
-      - mysql
-      - redis
-      - memcached
+    - mysql
+    - redis
+    - memcached
     volumes:
-      - ../data/www:/data/www:rw
-      - ../data/logs/php56-fpm:/var/log/php-fpm:rw
-      - ./php56/php.ini:/usr/local/etc/php/php.ini:ro 
-      - ./php56/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
+    - ../data/www:/data/www:rw
+    - ../data/logs/php56-fpm:/var/log/php-fpm:rw
+    - ./php56/php.ini:/usr/local/etc/php/php.ini:ro
+    - ./php56/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
     restart: always
     command: php-fpm
+    networks:
+    - vpcbr
 
   mysql:
-      build: ./mysql
-      ports:
-        - "3306:3306"
-      volumes:
-        - ../data/db/mysql:/var/lib/mysql:rw
-        - ../data/logs/mysql:/var/lib/mysql-logs:rw
-        - ./mysql/conf.d:/etc/mysql/conf.d:ro
-      environment:
-        MYSQL_ROOT_PASSWORD: 123456
-      restart: always
-      command: "--character-set-server=utf8"
+    build: ./mysql
+    #container_name: mysql_db_1
+    expose:
+    - "3306"
+    ports:
+    - "3306:3306"
+    volumes:
+    - ../data/db/mysql:/var/lib/mysql:rw
+    - ../data/logs/mysql:/var/lib/mysql-logs:rw
+    - ./mysql/conf.d:/etc/mysql/conf.d:ro
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    restart: always
+    networks:
+    - vpcbr
 
   redis:
-      build: ./redis
-      ports:
-        - "6379:6379"
-      volumes:
-        - ../data/db/redis:/data
-        - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro 
-        - ../data/logs/redis:/var/log/redis
-      restart: always
+    build: ./redis
+    volumes:
+    - ../data/db/redis:/data
+    - ../data/logs/redis:/var/log/redis
+    - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    restart: always
+    networks:
+    - vpcbr
 
   memcached:
-      image: memcached:1.5.7
-      #ports:
-      #  - "11211:11211"
+    image: memcached:1.5.7
+    #ports:
+    #  - "11211:11211"
+    networks:
+      vpcbr:
+        ipv4_address: "10.10.0.102"
 
 #远程管理工具
-#phpmyadmin:
-#  image: phpmyadmin/phpmyadmin:latest
-#  links:
-# - mysql
-# ports:
-# - "8086:80"
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    expose:
+    - "80"
+    ports:
+    - "8086:80"
+    networks:
+    - vpcbr
 
-#phpredisadmin:
-#  image: erikdubbelboer/phpredisadmin:latest
-# links:
-#  - redis
-# ports:
-# - "8089:80"
+  phpredisadmin:
+    image: erikdubbelboer/phpredisadmin:latest
+    #links:
+    #- redis
+    ports:
+    - "8089:80"
+    networks:
+    - vpcbr
+
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: "10.10.0.0/24"
+        gateway: "10.10.0.1"

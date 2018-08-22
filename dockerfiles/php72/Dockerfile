@@ -35,6 +35,7 @@ RUN apt-get update \
       libssl-dev \
       libmosquitto-dev \
       librabbitmq-dev \
+      iputils-ping telnet \
       git vim \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install gd \

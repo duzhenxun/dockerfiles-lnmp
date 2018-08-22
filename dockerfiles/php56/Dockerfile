@@ -47,4 +47,5 @@ RUN php -r "copy('https://install.phpcomposer.com/installer', 'composer-setup.ph
     && composer config -g repo.packagist composer https://packagist.phpcomposer.com
 
 # Write Permission
+
 RUN usermod -u 1000 www-data
