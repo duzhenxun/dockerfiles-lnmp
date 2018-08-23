@@ -25,8 +25,8 @@ RUN apt-get update \
       librabbitmq-dev \
       libicu-dev \
       libxml2-dev \
-      libxslt-dev
-      libbz2-dev
+      libxslt-dev \
+      libbz2-dev \
       git vim \
     && :\
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
