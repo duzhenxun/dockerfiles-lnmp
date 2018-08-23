@@ -38,9 +38,8 @@ RUN apt-get update \
     && apt-get autoremove --purge -y
 
 # Composer install
-COPY ./ext/composer.phar /bin/composer \
-RUN composer config -g repo.packagist composer https://packagist.phpcomposer.com
-
+COPY ./ext/composer.phar /usr/local/bin/composer
+#RUN composer config -g repo.packagist composer https://packagist.phpcomposer.com
 # 使用源码包方式安装扩展
 # Install Redis extension from source
 COPY ./ext/redis-4.1.0.tgz /tmp/redis.tgz
