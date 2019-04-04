@@ -17,14 +17,13 @@
 --- --- docker-composer.yml | docker配置执行文件
 
 # 一 、手动安装容器 （推荐使用此方法）
-这种方法安装无需下载项目，安下面的配置操作即可
 ````
 一,设置docker环境相关信息
 1，创建目录文件夹，如果你是windows系统请将/data/ 换成你的电脑硬盘路径即可
 /data/wwwroot
 /data/docker
 2，下载到本地
-git clone git@github.com:duzhenxun/dockerfiles-lnmp.git /data/docker
+git clone https://github.com/duzhenxun/dockerfiles-lnmp.git /data/docker
 
 二，新建网络
 如果有固定ip，我们不需要再使用link容器。这样会方便很多，我们这里以10.10.10.0段的网络举例子
