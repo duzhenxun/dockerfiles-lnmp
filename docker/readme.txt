@@ -1,40 +1,27 @@
-如果想手动运行。
-1，先建文夹/data/docker-cnf 将docker-cnf 文件复制
-2，安装镜像
-docker pull mysql:5.6
-docker pull redis
-docker pull nginx
-docker pull duzhenxun/php72
-docker pull duzhenxun/php56
-3,创建容器
-docker run --name mysql  -p 3306:3306 -e MYSQL_ROOT_PASSWORD=qq5552123 -d \
--v /data/docker-data/mysql/:/var/lib/mysql/ \
--v /data/docker-logs/mysql/:/var/log/mysql/ \
--v /data/docker-conf/mysql/conf.d/:/etc/mysql/conf.d/ \
--v /data/docker-conf/mysql/my.cnf:/etc/mysql/my.cnf \
-mysql:5.6
+如果你不想使用docker-compose启动，想使用最原始的方法启动，可参照我平时的习惯
 
-docker run --name redis -d -p 6379:6379 \
--v /data/docker-data/redis/:/usr/local/redis/data/ \
--v /data/docker-log/redis/:/usr/local/redis/logs/ \
--v /data/docker-conf/redis/redis.conf:/usr/local/redis/redis.conf \
-redis redis-server /usr/local/redis/redis.conf
+============================ start =====================================================================
+一,设置docker环境相关信息
+1，在本地创建文件夹
+/data/docker-conf
+/data/docker-logs
+/data/docker-data
 
-docker run --name php72  -d --link mysql --link redis \
--v /data/wwwroot:/data/wwwroot \
--v /data/docker-logs/php72/:/var/log/php-fpm \
--v /data/docker-conf/php72/php.ini:/usr/local/etc/php/php.ini \
--v /data/docker-conf/php72/php-fpm.conf:/usr/local/etc/php-fpm.conf \
+二，拉取镜像或制作镜像 docker pull
+nginx
+redis
 duzhenxun/php72
-
-docker run --name php56  -d --link mysql --link redis \
--v /data/wwwroot:/data/wwwroot \
--v /data/docker-logs/php56/:/var/log/php-fpm \
--v /data/docker-conf/php56/php.ini:/usr/local/etc/php/php.ini \
--v /data/docker-conf/php56/php-fpm.conf:/usr/local/etc/php-fpm.conf \
 duzhenxun/php56
+mysql:5.6
+elasticsearch:6.4.0
 
-docker run --name nginx   --link php72 --link php56 -d -p 80:80 \
+三，新建网络
+docker network create --subnet=10.10.10.0/16  --gateway=10.10.10.1 ado
+
+四，启动容器
+
+NGINX服务
+docker run --name nginx  -d -p 80:80 --net ado --ip 10.10.10.11  \
 -v /data/wwwroot/:/data/wwwroot/ \
 -v /data/docker-logs/nginx/:/var/log/nginx/ \
 -v /data/docker-conf/nginx/conf.d/:/etc/nginx/conf.d/ \
@@ -42,8 +29,327 @@ docker run --name nginx   --link php72 --link php56 -d -p 80:80 \
 -v /data/docker-conf/nginx/my_params:/etc/nginx/my_params \
 nginx
 
-设置数据可连接范围
-grant all privileges on *.* to root@'172.17.0.%' identified by 'qq5552123' with grant option;
+php7.2服务
+docker run -d --name php   --net ado --ip 10.10.10.21   -p 7000:7000 \
+-v /data/wwwroot:/data/wwwroot \
+-v /data/docker-logs/php72/:/var/log/php-fpm \
+-v /data/docker-conf/php72/php.ini:/usr/local/etc/php/php.ini \
+-v /data/docker-conf/php72/php-fpm.conf:/usr/local/etc/php-fpm.conf \
+duzhenxun/php72
+
+php5.6服务
+docker run -d --name php56    --net ado --ip 10.10.10.22 -p 7056:7000 \
+-v /data/wwwroot:/data/wwwroot \
+-v /data/docker-logs/php56/:/var/log/php-fpm \
+-v /data/docker-conf/php56/php.ini:/usr/local/etc/php/php.ini \
+-v /data/docker-conf/php56/php-fpm.conf:/usr/local/etc/php-fpm.conf \
+duzhenxun/php56
+
+mysql:5.6服务
+docker run -d --name mysql  --net ado --ip 10.10.10.31 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456    \
+-v /data/docker-data/mysql/:/var/lib/mysql/ \
+-v /data/docker-logs/mysql/:/var/log/mysql/ \
+-v /data/docker-conf/mysql/conf.d/:/etc/mysql/conf.d/ \
+-v /data/docker-conf/mysql/my.cnf:/etc/mysql/my.cnf \
+mysql:5.6
+
+让其它容器可以连接
+grant all privileges on *.* to admin@'10.10.10.%' identified by 'adminadmin' with grant option;
 flush privileges;
+
+redis 服务
+docker run -d  --name  redis --net ado --ip 10.10.10.41 -p 6379:6379 \
+-v /data/docker-data/redis/:/usr/local/redis/data/ \
+-v /data/docker-logs/redis/:/usr/local/redis/logs/ \
+-v /data/docker-conf/redis/redis.conf:/usr/local/redis/redis.conf  \
+redis redis-server /usr/local/redis/redis.conf
+
+elasticsearch服务
+docker run -d --name es --net ado --ip 10.10.10.61 -p 9200:9200 -p 9300:9300 \
+-v /data/docker-conf/es/elasticsearch_1.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
+elasticsearch:6.4.0
+
+docker run -d --name es2 --net ado --ip 10.10.10.62  \
+-v /data/docker-conf/es/elasticsearch_2.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
+elasticsearch:6.4.0
+
+============================ end =====================================================================
+
+常用命令
+systemctl start docker 启动docker
+systemctl daemon-reload
+systemctl restart docker
+ chkconfig --list
+service mysqld start/stop
+/etc/init.d/mysqld start/stop
+mysqladmin -p -u root shutdown
+
+docker info
+docker pull nginx  下载镜像
+docker run -p 8080:80 -d nginx 后台启动容器
+docker exec  -it d6d933711bc2 /bin/bash  进入
+ctrl+p  ctrl+q 退出，保持运行
+docker ps 查看运行的容器
+docker ps -a 查看所有容器
+docker stop d6d933711bc2 停指定容器
+docker rm d6d933711bc2 删指定容器
+docker stop $(docker ps -q) 停止所有容器
+docker rm $(docker ps -a -q) 删除所有容器
+docker image 查看所有镜像
+docker rmi c82521676580 删镜像
+docker system df 查看占用空间
+docker inspect --format='{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aq) 使用显示所有容器IP地址
+docker rename old_name new_name  重命名一个容器
+docker tag 4cbf48630b46 duzhenxun/centos-test 打包镜像
+docker run --rm -it alpine  time dd if=/dev/zero of=test.dat bs=1024 count=1000000
+docker inspect web1 ///查看
+ apt-get update
+apt-get install -y vim
+
+加速
+/etc/docker/daemon.json
+{
+"registry-mirrors": ["http://hub-mirror.c.163.com"]
+}
+
+自己做镜像
+1,使用commit
+docker commit
+docker commit -p du1 // -p 暂停内部操作
+docker tag imgid duzhenxun/nginx:v1.0
+docker tag duzhenxun/nginx:v1.0 duzhenxun/nginx:latest
+docker image rm /duzhenxun/nginx:latest
+docket commit -a "5552123@qq.com" -p -c 'CMD ["/bin/nginx"]' nginx duzhenxun/nginx-web:v1.0
+docker login
+docker push duzhenxun/nginx-web:v1.0
+
+2,使用 save
+docker save -o dzximages.gz duzhenxun/nginx:v1.0 duzhenxun/nginx:v1.2  打包
+docker load -i dzximages.gz  导入镜像
+
+网络方面
+docker network create --subnet=10.10.10.0/16  --gateway "10.10.10.1" ado
+docker run -d --name es1 --net ado --ip 10.10.10.61 elasticsearch:6.4.0
+ifconfig  查看网络
+ip linkset dev br-xxxx name docker1
+启动容器加入到新加的网络中
+docker run --name du1 -it --network  ado --ip 10.10.10.101 busybox
+docker run --name du2 -it --network ado --ip 10.10.10.102 busybox
+
+cat /pro/sys/net/ipv4/ip_forward  开启net转发
+
+日志
+sudo docker logs   --tail 10 es61
+
+远程连接docker
+/etc/docker/daemon.json中
+"hosts":["tcp://0.0.0.0:2375","unix:///var/run/docker.sock"]
+
+修改docker网络IP段
+  "registry-mirrors" : [
+    "https://hub-mirror.c.163.com"
+  ],
+  "debug" : true,
+  "experimental" : true,
+  "bip" : "10.0.0.1/16" ,
+"hosts":["tcp://0.0.0.0:2375","unix:///var/run/docker.sock"],
+"insecure-registries":["0532888.cn:5000"] //http协议
+
+快速查看容器信息
+docker inspect -f {{.Monnts}} du01
+docker inspect -f {{.NetworkSettings.IPAddress}} du01
+
+docker run -it --name box1 -v /data/www:/data busybox
+docker run -it --name box2 --volumes-from box1 busybox //和box1挂载一样的卷
+
+做镜像 dockerfile
+docker build -t dzxweb:v0.1 ./ dockerfile在当前目录
+docker run --rm dzxweb:v0.1 cat xxx  查看文件后退出删除容器
+
+WORKDIR /usr/local/src/
+//下面ADD 会将文件复制到上面的工作目录中
+ADD http://xxx.com/a.tar.gz /. 不会解
+ADD a.tar.gz /. 自动解压
+ENV DOC_ROOT=/data/web/html/ 变量
+
+COPY index.html ${DOC_ROOT:-/data/web/html/}
+
+
+FROM nginx
+CMD["/bin/httpd","-f","-h ${WEB_DOC_ROOT}"]
+ENTRYPOINT ["/bin/sh","-c"] 不可覆盖后面参数]
+
+ENV NGX_DOC_ROOT='/data/web/html'
+ADD index.html ${NGX_DOC_ROOT}
+ADD entrypoint.sh /bin/
+CMD ['/usr/sbin/nginx','-g','daemon off;']
+ENTRYPOINT ['/bin/entrypoint.sh']
+
+
+#!/bin/sh
+#
+cat >/etc/nginx/conf.d/www.conf << EOF
+server{
+sever_name ${HOSTNAME};
+listen ${IP:-0.0.0.0}:${PORT:-80};
+root ${NGX_DOC_ROOT:-/usr/share/nginx/html};
+}
+EOF
+exec "$@"
+
+docker build -t dzx-nginx:v0.1
+docker run --name dzxweb --rm -e "PORT=8080" dzx-nginx:v0.1
+
+HEALTHCHECK  健康检测
+vmware/harhor 图形化仓库管理
+
+资源分配
+hub.docker.com/r/lorel/docker-stress-ng
+docker pull lorel/docker-stress-ng
+docker run --name stress -it --rm -m 256m --cpus 2 /lorel/docker-stress-ng:latest --cpu 8 --vm 2
+docker run --name stress -it --rm -m 256m --cpu--shares  1024 /lorel/docker-stress-ng:latest --cpu 8 --vm 2
+
+CPU是可压缩资源,内存不是
+
+
+内存1G，CPU1核 docker容器使用
+1,mysql
+--------------------------------------------------------------------------------
+my.cnf 文件
+[mysqld]
+skip-host-cache
+skip-name-resolve
+datadir = /var/lib/mysql
+log-error	= /var/log/mysql/error.log
+
+slow_query_log
+long_query_time         = 1
+slow-query-log-file     = /var/log/mysql/slow.log
+server-id=1
+log-bin=mysql-bin
+default-storage-engine  = InnoDB
+character-set-server    = utf8mb4
+collation-server        = utf8mb4_unicode_ci
+
+!includedir /etc/mysql/conf.d/
+
+--------------------------------------------------------------------------------
+
+
+2,redis
+
+
+3,php72
+--------------------------------------------------------------------------------
+php-fpm.conf
+[global]
+daemonize = no
+[www]
+user = www-data
+group = www-data
+listen = [::]:9000
+
+pm = dynamic
+;pm = static
+pm.max_children = 10
+pm.start_servers = 4
+pm.min_spare_servers = 4
+pm.max_spare_servers = 10
+
+clear_env = no
+rlimit_files = 1048576
+;request_terminate_timeout = 0
+;request_slowlog_timeout = 1
+;slowlog = /data/log/php/php-slow.log
+
+access.format = "%t \"%m %r%Q%q\" %s %{mili}dms %{kilo}Mkb %C%%"
+catch_workers_output = yes
+
+php_flag[display_errors] = on
+;php_admin_flag[log_errors] = true
+php_admin_value[date.timezone] = "Asia/Shanghai"
+--------------------------------------------------------------------------------
+
+
+4,nginx
+--------------------------------------------------------------------------------
+fastcgi_env配置文件
+
+fastcgi_param  SITE_ENV           ‘local’;
+fastcgi_param  SITE_MEMC_SERVER   'memcached:11211';
+fastcgi_param  SITE_REDIS_SERVER  'redis:6379';
+
+fastcgi_param  DB_HOST  '127.0.0.1';
+fastcgi_param  DB_PORT  '3306';
+fastcgi_param  DB_USER  'dzx';
+fastcgi_param  DB_PASS  '123456';
+fastcgi_param  DB_NAME  'dzx';
+--------------------------------------------------------------------------------
+nginx.conf配置文件
+user www-data;
+pid /run/nginx.pid;
+
+worker_processes 4;
+worker_cpu_affinity 01 10 01 10;
+worker_rlimit_nofile 51200;
+
+events {
+    worker_connections 10240;
+    multi_accept on;
+}
+
+http {
+	include /etc/nginx/mime.types;
+	default_type application/octet-stream;
+	charset UTF-8;
+    server_names_hash_max_size 1024;
+    server_names_hash_bucket_size 64;
+    server_tokens off; #关闭版本显示
+
+    sendfile    on;
+    tcp_nodelay on;
+    access_log  on;
+
+    keepalive_timeout  65;
+    client_max_body_size 100m;
+    fastcgi_max_temp_file_size 0;
+    fastcgi_buffers 32 32k;
+    fastcgi_buffer_size 32k;
+    userid on;
+    userid_name uid;
+    userid_expires  365d;
+
+
+    # log setting
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log /var/log/nginx/access.log main;
+    error_log /var/log/nginx/error.log warn;
+
+
+    include /etc/nginx/conf.d/*.conf;
+}
+--------------------------------------------------------------------------------
+conf.d/php72.conf配置文件
+server {
+    listen   80;
+    server_name php72.com;
+    root /data/wwwroot/php72;
+    location / {
+        index index.php index.html index.htm;
+        try_files $uri $uri/ /index.html;
+    }
+
+    location ~ \.php {
+        include fastcgi_params;
+        #fastcgi_pass   172.16.0.10:9000;
+        fastcgi_pass   php72:9000;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+    }
+}
 
 
