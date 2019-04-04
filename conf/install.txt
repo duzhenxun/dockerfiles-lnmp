@@ -88,6 +88,10 @@ docker run -d --name es2 \
 -v /data/docker/conf/es/elasticsearch_2.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
 elasticsearch:6.4.0
 
+
+平时可以用以下命令批量启动与关闭你的容器
+docker start nginx php php56 mysql redis es es2
+docker stop nginx php php56 mysql redis es es2
 ============================ end =====================================================================
 
 我常用命令
