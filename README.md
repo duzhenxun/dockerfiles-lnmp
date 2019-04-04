@@ -23,7 +23,7 @@
 /data/wwwroot
 /data/docker
 2，下载到本地
-git clone https://github.com/duzhenxun/dockerfiles-lnmp.git /data/docker
+git clone https://gitee.com/duzhenxun/docker-lnmp.git /data/docker
 
 二，新建网络
 如果有固定ip，我们不需要再使用link容器。这样会方便很多，我们这里以10.10.10.0段的网络举例子
@@ -111,7 +111,7 @@ docker stop nginx php php56 mysql redis es es2
 #### 下载dockerfiles-lnmp
 ```
 1,下载源码 源码到data/docker下面
-git clone git@github.com:duzhenxun/dockerfiles-lnmp.git /data/docker
+git clone https://gitee.com/duzhenxun/docker-lnmp.git /data/docker
 
 2,进行docker-compose.yml所在文件夹执行命令即可：
 cd docker-compose 
