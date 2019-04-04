@@ -51,7 +51,7 @@ zookeeper
 #### 目录说明
 目录 | 说明
 ---|---
---- docker | 最原始的手动创建容器
+--- docker | 最原始的手动创建容器(本人目前在工作中使用这个目录下的方法)
 --- docker-compose | docker compose创建镜像
 --- --- mysql | mysql配置及安装文件
 --- --- nginx | nginx配置及安装文件

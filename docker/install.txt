@@ -1,13 +1,16 @@
 如果你不想使用docker-compose启动，想使用最原始的方法启动，可参照我平时的习惯
 
 ============================ start =====================================================================
-一,设置docker环境相关信息
-1，在本地创建文件夹
-/data/docker-conf
-/data/docker-logs
-/data/docker-data
 
-二，拉取镜像或制作镜像 docker pull
+一,设置docker环境相关信息
+1，本地文件夹与配置
+/data/docker/conf
+/data/docker/logs
+/data/docker/data
+/data/wwwroot
+
+
+二，拉取镜像或制作镜像
 nginx
 redis
 duzhenxun/php72
@@ -21,36 +24,43 @@ docker network create --subnet=10.10.10.0/16  --gateway=10.10.10.1 ado
 四，启动容器
 
 NGINX服务
-docker run --name nginx  -d -p 80:80 --net ado --ip 10.10.10.11  \
+docker run -d --name nginx  \
+--net ado --ip 10.10.10.11 \
+-p 80:80 -p 81:81 \
 -v /data/wwwroot/:/data/wwwroot/ \
--v /data/docker-logs/nginx/:/var/log/nginx/ \
--v /data/docker-conf/nginx/conf.d/:/etc/nginx/conf.d/ \
--v /data/docker-conf/nginx/nginx.conf:/etc/nginx/nginx.conf \
--v /data/docker-conf/nginx/my_params:/etc/nginx/my_params \
+-v /data/docker/logs/nginx/:/var/log/nginx/ \
+-v /data/docker/conf/nginx/certs/:/etc/nginx/certs/ \
+-v /data/docker/conf/nginx/conf.d/:/etc/nginx/conf.d/ \
+-v /data/docker/conf/nginx/nginx.conf:/etc/nginx/nginx.conf \
+-v /data/docker/conf/nginx/my_params:/etc/nginx/my_params \
 nginx
 
 php7.2服务
-docker run -d --name php   --net ado --ip 10.10.10.21   -p 7000:7000 \
--v /data/wwwroot:/data/wwwroot \
--v /data/docker-logs/php72/:/var/log/php-fpm \
--v /data/docker-conf/php72/php.ini:/usr/local/etc/php/php.ini \
--v /data/docker-conf/php72/php-fpm.conf:/usr/local/etc/php-fpm.conf \
+docker run -d --name php   \
+--net ado --ip 10.10.10.21 -p 9000:9000 -p 8080:8080 \
+-v /data/wwwroot/:/data/wwwroot/ \
+-v /data/docker/logs/php72/:/var/log/php-fpm/ \
+-v /data/docker/conf/php72/php.ini:/usr/local/etc/php/php.ini \
+-v /data/docker/conf/php72/php-fpm.conf:/usr/local/etc/php-fpm.conf \
 duzhenxun/php72
 
 php5.6服务
-docker run -d --name php56    --net ado --ip 10.10.10.22 -p 7056:7000 \
+docker run -d --name php56 \
+--net ado --ip 10.10.10.22 -p 9056:9000 \
 -v /data/wwwroot:/data/wwwroot \
--v /data/docker-logs/php56/:/var/log/php-fpm \
--v /data/docker-conf/php56/php.ini:/usr/local/etc/php/php.ini \
--v /data/docker-conf/php56/php-fpm.conf:/usr/local/etc/php-fpm.conf \
+-v /data/docker/logs/php56/:/var/log/php-fpm/ \
+-v /data/docker/conf/php56/php.ini:/usr/local/etc/php/php.ini \
+-v /data/docker/conf/php56/php-fpm.conf:/usr/local/etc/php-fpm.conf \
 duzhenxun/php56
 
 mysql:5.6服务
-docker run -d --name mysql  --net ado --ip 10.10.10.31 -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456    \
--v /data/docker-data/mysql/:/var/lib/mysql/ \
--v /data/docker-logs/mysql/:/var/log/mysql/ \
--v /data/docker-conf/mysql/conf.d/:/etc/mysql/conf.d/ \
--v /data/docker-conf/mysql/my.cnf:/etc/mysql/my.cnf \
+docker run -d --name mysql  \
+--net ado --ip 10.10.10.31 -p 3306:3306 \
+-e MYSQL_ROOT_PASSWORD=123456   \
+-v /data/docker/data/mysql/:/var/lib/mysql/ \
+-v /data/docker/logs/mysql/:/var/log/mysql/ \
+-v /data/docker/conf/mysql/conf.d/:/etc/mysql/conf.d/ \
+-v /data/docker/conf/mysql/my.cnf:/etc/mysql/my.cnf \
 mysql:5.6
 
 让其它容器可以连接
@@ -58,19 +68,24 @@ grant all privileges on *.* to admin@'10.10.10.%' identified by 'adminadmin' wit
 flush privileges;
 
 redis 服务
-docker run -d  --name  redis --net ado --ip 10.10.10.41 -p 6379:6379 \
--v /data/docker-data/redis/:/usr/local/redis/data/ \
--v /data/docker-logs/redis/:/usr/local/redis/logs/ \
--v /data/docker-conf/redis/redis.conf:/usr/local/redis/redis.conf  \
+docker run -d  --name  redis \
+--net ado --ip 10.10.10.41 -p 6379:6379 \
+-v /data/docker/data/redis/:/usr/local/redis/data/ \
+-v /data/docker/logs/redis/:/usr/local/redis/logs/ \
+-v /data/docker/conf/redis/redis.conf:/usr/local/redis/redis.conf  \
 redis redis-server /usr/local/redis/redis.conf
 
 elasticsearch服务
-docker run -d --name es --net ado --ip 10.10.10.61 -p 9200:9200 -p 9300:9300 \
--v /data/docker-conf/es/elasticsearch_1.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
+docker run -d --name es \
+--net ado --ip 10.10.10.61 -p 9200:9200 -p 9300:9300 \
+-v /data/docker/conf/es/elasticsearch_1.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
+-v /data/docker/logs/es/:/usr/share/elasticsearch/logs/ \
 elasticsearch:6.4.0
 
-docker run -d --name es2 --net ado --ip 10.10.10.62  \
--v /data/docker-conf/es/elasticsearch_2.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
+docker run -d --name es2 \
+--net ado --ip 10.10.10.62  \
+-v /data/docker/logs/es2/:/usr/share/elasticsearch/logs/ \
+-v /data/docker/conf/es/elasticsearch_2.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
 elasticsearch:6.4.0
 
 ============================ end =====================================================================
