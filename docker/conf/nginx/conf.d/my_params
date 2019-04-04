@@ -1,9 +1,0 @@
-fastcgi_param  SITE_ENV           ‘local’;
-fastcgi_param  SITE_MEMC_SERVER   '192.168.10.100:11211';
-fastcgi_param  SITE_REDIS_SERVER  '192.168.10.200:6379';
-
-fastcgi_param  DB_HOST  '192.168.10.200';
-fastcgi_param  DB_PORT  '3306';
-fastcgi_param  DB_USER  'dzx';
-fastcgi_param  DB_PASS  '123456';
-fastcgi_param  DB_NAME  'dzx';

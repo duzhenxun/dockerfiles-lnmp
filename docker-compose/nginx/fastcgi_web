@@ -1,3 +1,0 @@
-fastcgi_param  SITE_ENV           'dev';
-fastcgi_param  SITE_MEMC_SERVER   'memcached:11211';
-fastcgi_param  SITE_REDIS_SERVER  'redis:6379';
