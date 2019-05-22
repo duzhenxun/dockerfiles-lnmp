@@ -34,7 +34,7 @@ docker network create --subnet=10.10.10.0/16  --gateway=10.10.10.1 ado
 docker run -d --name nginx  \
 --net ado --ip 10.10.10.11 \
 -p 80:80 -p 81:81 \
--v /data/wwwroot/:/data/wwwroot/ \
+-v /data/wwwroot/:/data/wwwroot/ \  
 -v /data/docker/logs/nginx/:/var/log/nginx/ \
 -v /data/docker/conf/nginx/certs/:/etc/nginx/certs/ \
 -v /data/docker/conf/nginx/conf.d/:/etc/nginx/conf.d/ \
@@ -73,7 +73,7 @@ mysql:5.6
 让其它容器可以连接
 docker exec -it mysql bash
 mysql -uroot -p123456;
-grant all privileges on *.* to admin@'10.10.10.%' identified by 'adminadmin' with grant option;
+grant all privileges on *.* to admin@'10.10.%' identified by 'adminadmin' with grant option;
 flush privileges;
 
 5，redis 容器
