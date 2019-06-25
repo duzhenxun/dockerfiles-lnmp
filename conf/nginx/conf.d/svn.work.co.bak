@@ -5,22 +5,23 @@
 #@date    2018/9/10 23:13
 server {
         listen       80; 
-        server_name ~^([a-z0-9\-]+)\.([a-z]+)\.work\.co$;
+        server_name ~^([a-z0-9]+)\.([a-z]+)\.work\.co$;
         set  $xmphpip "10.10.10.22:9000";
-
-		if ($host ~ ^([a-z0-9\-]+)\.([a-z]+)\.work\.co){
+		if ($host ~ ^([a-z0-9]+)\.([a-z]+)\.work\.co){
 					set $fz $1;
 					set $xm $2;
-
 		}
+		set $path "public";
+		  #php5项目
+        if ($xm ~ (cctv|juzhen)){
+              set $path "";
+        }
 
-        root   "/data/wwwroot/work/svn/$xm/branches/$fz/";
+
+        root   "/data/wwwroot/work/svn/$xm/$fz/$path";
         location / { 
             index   index.php;
-			#try_files $uri $uri/ /index.php?$query_string;
-            if (!-e $request_filename ){
-                rewrite ^(.+)$ /index.php?s=$1;
-            }
+			try_files $uri $uri/ /index.php?$query_string;
         }   
         location ~ \.php(.*)$ {
             fastcgi_pass   $xmphpip;
@@ -30,8 +31,6 @@ server {
             fastcgi_param  PATH_INFO  $fastcgi_path_info;
             fastcgi_param  PATH_TRANSLATED  $document_root$fastcgi_path_info;
             include        fastcgi_params;
-
-
             #加载服务器变量
 			include         conf.d/params/*.conf;
         }   

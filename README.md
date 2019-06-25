@@ -33,7 +33,7 @@ docker network create --subnet=10.10.10.0/16  --gateway=10.10.10.1 ado
 1，NGINX容器
 docker run -d --name nginx  \
 --net ado --ip 10.10.10.11 \
--p 80:80 -p 81:81 \
+-p 80:80 -p 81:81 -p 443:443 \
 -v /data/wwwroot/:/data/wwwroot/ \  
 -v /data/docker/logs/nginx/:/var/log/nginx/ \
 -v /data/docker/conf/nginx/certs/:/etc/nginx/certs/ \
@@ -107,6 +107,8 @@ elasticsearch:6.4.0
 docker start nginx php php56 mysql redis es es2
 docker stop nginx php php56 mysql redis es es2
 
+
+7,go
 结束~
 
 ````

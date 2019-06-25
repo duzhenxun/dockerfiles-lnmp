@@ -1,0 +1,21 @@
+server {
+     listen 443;
+     server_name 0532888.cn;
+     ssl_certificate certs/1_0532888.cn_bundle.crt;
+     ssl_certificate_key certs/2_0532888.cn.key;
+     ssl_session_timeout 5m;
+     ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+     ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
+     ssl_prefer_server_ciphers on;
+     root   "/data/wwwroot/php7";
+     location / {
+         index   index.php;
+         try_files $uri $uri/ /index.php?$query_string;
+     }
+     location ~ \.php(.*)$ {
+         fastcgi_pass   10.10.10.21:9000;
+         fastcgi_index  index.php;
+         fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+         include        fastcgi_params;
+     }
+ }
