@@ -21,7 +21,10 @@ server {
             if (!-e $request_filename ){
                 rewrite ^(.+)$ /index.php?s=$1;
             }
-        }   
+        }
+/api/
+/
+
         location ~ \.php(.*)$ {
             fastcgi_pass   $xmphpip;
             fastcgi_index  index.php;

@@ -1,5 +1,5 @@
 # 项目介绍
-此项目是使用Docker搭建php5.6，php7.2，nginx1.12，redis4.0，mysql5.6，elasticsearch，swoole等环境
+此项目是使用Docker搭建php5.6，php7.2，nginx1.12，redis4.0，mysql5.7，elasticsearch，swoole等环境
 开发中需要使用PHP5.6与PHP7.2两个版本，如有配置不对请指正。QQ:5552123(Ado)
 #### 目录说明
 目录 | 说明
@@ -7,7 +7,7 @@
 --- conf | docker手动安装配置文件
 --- --- nginx | nginx配置
 --- --- redis | redis配置
---- --- mysql | redis配置
+--- --- mysql | mysql配置
 --- --- php56 | php5.6配置
 --- --- php72 | php7.2配置
 --- --- es | elasticsearch配置
@@ -60,7 +60,7 @@ docker run -d --name php56 \
 -v /data/docker/conf/php56/php-fpm.conf:/usr/local/etc/php-fpm.conf \
 duzhenxun/php56
 
-4，mysql:5.6容器
+4，mysql:5.7容器
 docker run -d --name mysql  \
 --net ado --ip 10.10.10.31 -p 3306:3306 \
 -e MYSQL_ROOT_PASSWORD=123456   \
@@ -68,7 +68,7 @@ docker run -d --name mysql  \
 -v /data/docker/logs/mysql/:/var/log/mysql/ \
 -v /data/docker/conf/mysql/conf.d/:/etc/mysql/conf.d/ \
 -v /data/docker/conf/mysql/my.cnf:/etc/mysql/my.cnf \
-mysql:5.6
+mysql:5.7
 
 让其它容器可以连接
 docker exec -it mysql bash
