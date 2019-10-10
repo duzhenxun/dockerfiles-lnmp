@@ -108,7 +108,7 @@ docker start nginx php php56 mysql redis es es2
 docker stop nginx php php56 mysql redis es es2
 
 
-7,go
+7,docker run -d --net ado --ip 10.10.10.101 -p 10022:22 -v /data:/data --name centos1 duzhenxun/centos7
 结束~
 
 ````
