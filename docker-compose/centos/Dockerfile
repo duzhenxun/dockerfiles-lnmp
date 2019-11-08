@@ -27,5 +27,5 @@ EXPOSE 22
 CMD ["/usr/local/sbin/run.sh"]
 
 #创建容器
-#docker run -d --name centos1 -p 10022:22 centos_sshd:v1 /usr/local/sbin/run.sh
+#docker run -d --name centos7 -p 10022:22 duzhenxun/centos7
 #ssh root@127.0.0.1 -p 10022
