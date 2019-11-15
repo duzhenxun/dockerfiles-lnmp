@@ -62,17 +62,15 @@ duzhenxun/php56
 
 4，mysql:5.7容器
 docker run -d --name mysql  \
---net ado --ip 10.10.10.31 -p 3306:3306 \
--e MYSQL_ROOT_PASSWORD=123456   \
+--net ado --ip 10.10.10.31 -p 23306:3306 \
+-e MYSQL_ROOT_PASSWORD=qq5552123   \
 -v /data/docker/data/mysql/:/var/lib/mysql/ \
--v /data/docker/logs/mysql/:/var/log/mysql/ \
--v /data/docker/conf/mysql/conf.d/:/etc/mysql/conf.d/ \
 -v /data/docker/conf/mysql/my.cnf:/etc/mysql/my.cnf \
 mysql:5.7
 
 让其它容器可以连接
 docker exec -it mysql bash
-mysql -uroot -p123456;
+mysql -uroot -pqq5552123;
 grant all privileges on *.* to admin@'10.10.%' identified by 'adminadmin' with grant option;
 flush privileges;
 
@@ -109,6 +107,8 @@ docker stop nginx php php56 mysql redis es es2
 
 
 7,docker run -d --net ado --ip 10.10.10.101 -p 10022:22 -v /data:/data --name centos1 duzhenxun/centos7
+或者
+docker run -d --restart=always --name c1 --net ado --ip 10.10.10.101 -p 10022:22 -p 80:80 -p 81:81 -p 888:888 -p 8888:8888 -p 3306:3306 -p 6379:6379 -p 443:443 -v /www:/www duzhenxun/centos7
 结束~
 
 ````
