@@ -83,23 +83,23 @@ docker run -d  --name  redis \
 redis redis-server /usr/local/redis/redis.conf
 
 6，elasticsearch容器
-docker run -d --name es \
+docker run -d --name es1 \
 --net ado --ip 10.10.10.61 -p 9200:9200 -p 9300:9300 \
 -v /data/docker/conf/es/elasticsearch_1.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
 -v /data/docker/logs/es/:/usr/share/elasticsearch/logs/ \
-elasticsearch:6.4.0
+elasticsearch:7.4.2
 
 docker run -d --name es2 \
 --net ado --ip 10.10.10.62  \
 -v /data/docker/logs/es2/:/usr/share/elasticsearch/logs/ \
 -v /data/docker/conf/es/elasticsearch_2.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
-elasticsearch:6.4.0
+elasticsearch:7.4.2
 
 docker run -d --name es3 \
 --net ado --ip 10.10.10.63  \
 -v /data/docker/logs/es3/:/usr/share/elasticsearch/logs/ \
 -v /data/docker/conf/es/elasticsearch_3.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
-elasticsearch:6.4.0
+elasticsearch:7.4.2
 
 平时可以用以下命令批量启动与关闭你的容器
 docker start nginx php php56 mysql redis es es2
